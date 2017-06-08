@@ -17,5 +17,8 @@ public class MainActivity extends AppCompatActivity {
         db = new Database(this);
         int count = db.getRecords();
         Log.i("===Count", "====Count::" + count);
+        boolean res = db.updateUser();
+        Log.i("===Update", "====Update::" + res);
+        db.displayRecords();
     }
 }

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteStatement;
+import android.util.Log;
 
 import com.msr.dbcopy.DatabaseContants;
 
@@ -72,7 +74,7 @@ public class Database {
             this.copyDatabase(dbName);
         }
         try {
-            this.db = SQLiteDatabase.openDatabase(this.context.getApplicationInfo().dataDir + "/" + dbName, null, SQLiteDatabase.OPEN_READONLY);
+            this.db = SQLiteDatabase.openDatabase(this.context.getApplicationInfo().dataDir + "/" + dbName, null, SQLiteDatabase.OPEN_READWRITE);
         } catch (SQLiteException e) {
             this.db = null;
         }
@@ -111,6 +113,43 @@ public class Database {
             return 0;
         }
         return count;
+    }
+
+    public void displayRecords() {
+        Cursor cursor = null;
+        int count = 0;
+        if (this.db != null && this.db.isOpen()) {
+            try {
+                cursor = db.rawQuery("SELECT * from " + DatabaseContants.TABLE_EMPLOYEE, null);
+                if (cursor.moveToFirst()) {
+                    do {
+                        Log.i("===Desig::", "===" + cursor.getString(2));
+                    } while (cursor.moveToNext());
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (cursor != null && !cursor.isClosed()) {
+                    cursor.close();
+                }
+            }
+        }
+    }
+
+    public boolean updateUser() {
+        try {
+            if (this.db != null && this.db.isOpen()) {
+                SQLiteStatement stmt = db.compileStatement("UPDATE EMPLOYEE set DESIGNATION = ? where SLNO =?");
+                stmt.bindString(1, "Lead");
+                stmt.bindLong(2, 1);
+                stmt.execute();
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**
